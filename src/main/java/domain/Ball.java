@@ -55,6 +55,7 @@ public class Ball {
     public float getRadius() { return radius; }
 
     public void startMoving(){
+        attachedToPaddle = false;
         speed.setSpeed(150);
     }
 
