@@ -1,11 +1,10 @@
 import com.raylib.Colors;
-import domain.Game;
+import application.Game;
 import domain.ScreenSize;
 import infra.RaylibCollisionDetector;
+import infra.RaylibInputController;
 import infra.RaylibRenderer;
 
-import static com.raylib.Colors.LIGHTGRAY;
-import static com.raylib.Colors.RAYWHITE;
 import static com.raylib.Raylib.*;
 
 public class Main {
@@ -19,25 +18,20 @@ public class Main {
 
         var renderer = new RaylibRenderer();
         var collisionDetector = new RaylibCollisionDetector();
+        var raylibController = new RaylibInputController();
 
         var game = new Game(screenSize);
         while (!WindowShouldClose())
         {
             var deltaTime = GetFrameTime();
+            game.updateDeltaTime(deltaTime);
 
             // Read inputs
-            if(IsKeyDown(KEY_LEFT)){
-                game.movePaddle(deltaTime,-1);
-            }
-            if(IsKeyDown(KEY_RIGHT)){
-                game.movePaddle(deltaTime,1);
-            }
-            if(IsKeyDown(KEY_UP)){
-                game.throwBall();
-            }
+            raylibController.readInputs(game.getController());
+
             // Update
             //----------------------------------------------------------------------------------
-            game.update(deltaTime, collisionDetector);
+            game.update(collisionDetector);
             //----------------------------------------------------------------------------------
 
 

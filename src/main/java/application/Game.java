@@ -10,6 +10,7 @@ import java.util.List;
 public class Game {
     private final Paddle paddle;
     private List<Ball> balls;
+    private float deltaTime;
 
     public Game(ScreenSize screenSize){
         // Initialization vars (can be moved to config file)
@@ -21,7 +22,7 @@ public class Game {
         balls.add(new Ball(screenSize, new Position(paddle.getMiddleX(), pos.y()), ballRadius,true, 45, 0));
     }
 
-    public void update(float deltaTime, ColissionDetector colissionDetector){
+    public void update(ColissionDetector colissionDetector){
 
 
         for(var ball : balls){
@@ -32,7 +33,7 @@ public class Game {
         }
     }
 
-    public void movePaddle(float deltaTime, int dir){
+    public void movePaddle(int dir){
         if(dir == -1) {
             if (paddle.moveLeft(deltaTime)) {
                 if (balls.stream().anyMatch(b -> b.isAttachedToPaddle())) {
@@ -61,5 +62,9 @@ public class Game {
         if (balls.stream().anyMatch(b -> b.isAttachedToPaddle())) {
             balls.stream().filter(ball -> ball.isAttachedToPaddle()).forEach(b -> b.startMoving());
         }
+    }
+
+    public void updateDeltaTime(float dt){
+        deltaTime = dt;
     }
 }
