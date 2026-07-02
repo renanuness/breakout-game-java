@@ -1,5 +1,9 @@
-package domain;
+package application;
 
+import domain.Ball;
+import domain.Paddle;
+import domain.Position;
+import domain.ScreenSize;
 import domain.interfaces.ColissionDetector;
 import domain.interfaces.Renderer;
 
@@ -11,6 +15,7 @@ public class Game {
     private final Paddle paddle;
     private List<Ball> balls;
     private float deltaTime;
+    private Controller controller;
 
     public Game(ScreenSize screenSize){
         // Initialization vars (can be moved to config file)
@@ -20,11 +25,15 @@ public class Game {
         paddle = new Paddle(screenSize, pos);
         balls = new ArrayList<>();
         balls.add(new Ball(screenSize, new Position(paddle.getMiddleX(), pos.y()), ballRadius,true, 45, 0));
+
+        controller = new Controller(
+                (x)->this.movePaddle(-1),
+                (x)->this.movePaddle(1),
+                (x)->this.throwBall()
+        );
     }
 
     public void update(ColissionDetector colissionDetector){
-
-
         for(var ball : balls){
             ball.update(deltaTime);
             if(colissionDetector.ballAndPaddle(ball, paddle)){
@@ -66,5 +75,9 @@ public class Game {
 
     public void updateDeltaTime(float dt){
         deltaTime = dt;
+    }
+
+    public Controller getController(){
+        return controller;
     }
 }
