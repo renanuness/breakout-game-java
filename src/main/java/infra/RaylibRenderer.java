@@ -2,21 +2,24 @@ package infra;
 
 import com.raylib.Colors;
 import com.raylib.Raylib;
-import domain.Ball;
-import domain.Paddle;
-import domain.Position;
-import domain.Size;
+import domain.*;
 import domain.interfaces.Renderer;
 
-import static com.raylib.Raylib.DrawCircleV;
-import static com.raylib.Raylib.DrawRectangleV;
-import static infra.RaylibUtils.positionToVector2;
-import static infra.RaylibUtils.sizeToVector2;
+import java.util.List;
+
+import static com.raylib.Raylib.*;
+import static infra.RaylibUtils.*;
 
 public class RaylibRenderer extends Renderer {
+
+    public RaylibRenderer(ScreenSize screenSize) {
+        super(screenSize);
+    }
+
     @Override
     public void draw(Ball ball) {
         DrawCircleV(positionToVector2(ball.getCenterPosition()), ball.getRadius(), Colors.WHITE);
+
     }
 
     @Override
@@ -27,4 +30,17 @@ public class RaylibRenderer extends Renderer {
                 Colors.GRAY
         );
     }
+
+    @Override
+    public void draw(BrickCollection brickCollection) {
+        var bricks = brickCollection.getBricks();
+
+        for(int i = 0; i < brickCollection.rows(); i++){
+            for(int j = 0; j < brickCollection.columns(); j++){
+                var brick = bricks[i][j];
+                DrawRectangleV(positionToVector2(brick.getPosition()), sizeToVector2(brick.getSize()), domainColorToRaylibColor(brick.getColor()));
+            }
+        }
+    }
 }
+

@@ -1,6 +1,8 @@
 package infra;
 
+import com.raylib.Colors;
 import com.raylib.Raylib;
+import domain.Color;
 import domain.Position;
 import domain.Size;
 
@@ -26,5 +28,33 @@ public class RaylibUtils {
         rec.x(position.x());
         rec.y(position.y());
         return rec;
+    }
+
+    public static Raylib.Color domainColorToRaylibColor(Color color){
+        switch (color){
+            case BLACK -> {
+                return Colors.BLACK;
+            }
+            case BLUE -> {
+                return Colors.BLUE;
+            }
+            case GRAY -> {
+                return Colors.GRAY;
+            }
+            case GREEN -> {
+                return Colors.GREEN;
+            }
+            case ORANGE -> {
+                return Colors.ORANGE;
+            }
+            case RED -> {
+                return Colors.RED;
+            }
+            case YELLOW -> {
+                return Colors.YELLOW;
+            }default -> {
+                return Colors.DARKPURPLE;
+            }
+        }
     }
 }

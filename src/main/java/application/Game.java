@@ -1,9 +1,6 @@
 package application;
 
-import domain.Ball;
-import domain.Paddle;
-import domain.Position;
-import domain.ScreenSize;
+import domain.*;
 import domain.interfaces.ColissionDetector;
 import domain.interfaces.Renderer;
 
@@ -16,15 +13,24 @@ public class Game {
     private List<Ball> balls;
     private float deltaTime;
     private Controller controller;
+    private ScreenSize screenSize;
+    private BrickCollection brickCollection;
 
-    public Game(ScreenSize screenSize){
+    public Game(Definitions definitions){
         // Initialization vars (can be moved to config file)
+
+        this.screenSize = definitions.getScreenSize();
         float ballRadius = 15f;
 
         var pos = new Position(512, 700);
         paddle = new Paddle(screenSize, pos);
         balls = new ArrayList<>();
-        balls.add(new Ball(screenSize, new Position(paddle.getMiddleX(), pos.y()), ballRadius,true, 45, 0));
+        balls.add(new Ball(screenSize, new Position(paddle.getMiddleX(), pos.y()), ballRadius,true, 45, 0, ((x)->ballFollowed(x))));
+        createDummyBall();
+
+        var columns = definitions.getBricksLayout().columns();
+        var startingX = definitions.getStartingBricksPosition();
+        brickCollection = new BrickCollection(definitions);
 
         controller = new Controller(
                 (x)->this.movePaddle(-1),
@@ -33,11 +39,16 @@ public class Game {
         );
     }
 
+    private void createDummyBall(){
+        var ball = new Ball(screenSize, new Position(screenSize.width()/2, screenSize.height()/2), 15f, false, 45, -200, ((x)->ballFollowed(x)));
+        balls.add(ball);
+    }
+
     public void update(ColissionDetector colissionDetector){
         for(var ball : balls){
             ball.update(deltaTime);
             if(colissionDetector.ballAndPaddle(ball, paddle)){
-                ball.updateAngle(225);
+                ball.collideWithPaddle(paddle.getSpeed().getSpeed());
             }
         }
     }
@@ -60,6 +71,8 @@ public class Game {
     }
 
     public void draw(Renderer renderer){
+        brickCollection.draw(renderer);
+
         for(var ball : balls){
             ball.draw(renderer);
         }
@@ -79,5 +92,18 @@ public class Game {
 
     public Controller getController(){
         return controller;
+    }
+
+    private void ballFollowed(Ball ball){
+        balls.remove(ball);
+        if(balls.isEmpty()){
+            System.out.println("GAME OVER");
+        }
+    }
+
+    public List<Ball> getBalls() { return balls;    }
+
+    public float getDeltaTime() {
+        return deltaTime;
     }
 }

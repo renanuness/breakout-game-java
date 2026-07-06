@@ -8,6 +8,7 @@ public class Paddle {
     private Size size;
     private ScreenSize screenSize;
 
+
     public Paddle(ScreenSize screenSize, Position startingPosition){
         position = startingPosition;
         speed = new Speed(200);

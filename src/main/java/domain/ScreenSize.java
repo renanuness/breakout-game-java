@@ -2,6 +2,7 @@ package domain;
 
 public class ScreenSize {
     private int width;
+
     private int height;
 
     public ScreenSize(int width, int height){
@@ -9,6 +10,27 @@ public class ScreenSize {
         this.height = height;
     }
 
+    public ScreenSize() {}
+
     public int width() { return width; }
     public int height() { return height; }
+
+
+    // region Getters & Setters
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+    // endregion
 }

@@ -1,0 +1,80 @@
+{
+  "screenSize": {
+    "width": 1024,
+    "height": 768
+  },
+  "bricksLayout":{
+     "size": {
+       "width": 100,
+       "height": 25
+     },
+      "bricks":[
+      [
+        {
+          "type": "NORMAL",
+          "color": "RED"
+        },
+        {
+          "type": "NORMAL",
+          "color": "GREEN"
+        },
+        {
+          "type": "NORMAL",
+          "color": "RED"
+        },
+        {
+          "type": "NORMAL",
+          "color": "RED"
+        },
+        {
+          "type": "NORMAL",
+          "color": "RED"
+        }
+      ],
+      [
+        {
+          "type": "NORMAL",
+          "color": "RED"
+        },
+        {
+          "type": "NORMAL",
+          "color": "RED"
+        },
+        {
+          "type": "NORMAL",
+          "color": "RED"
+        },
+        {
+          "type": "NORMAL",
+          "color": "RED"
+        },
+        {
+          "type": "NORMAL",
+          "color": "RED"
+        }
+      ],
+      [
+        {
+          "type": "NORMAL",
+          "color": "RED"
+        },
+        {
+          "type": "NORMAL",
+          "color": "RED"
+        },
+        {
+          "type": "NORMAL",
+          "color": "RED"
+        },
+        {
+          "type": "NORMAL",
+          "color": "RED"
+        },
+        {
+          "type": "NORMAL",
+          "color": "RED"
+        }
+      ]
+    ]
+  }
+}

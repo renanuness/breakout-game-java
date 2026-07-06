@@ -2,6 +2,8 @@ package domain;
 
 import domain.interfaces.DrawBall;
 
+import java.util.function.Consumer;
+
 public class Ball {
     private Position position;
     private Speed speed;
@@ -9,13 +11,20 @@ public class Ball {
     private float angle;
     private ScreenSize screenSize;
     private boolean attachedToPaddle;
-
-    public Ball(ScreenSize screenSize, Position startingPosition, float radius, boolean attachedToPaddle, float angle, float initialSpeed){
+    private Consumer<Ball> ballFollowedEvent;
+    public Ball(ScreenSize screenSize,
+                Position startingPosition,
+                float radius,
+                boolean attachedToPaddle,
+                float angle,
+                float initialSpeed,
+                Consumer<Ball> ballFollowedEvent){
         speed = new Speed(initialSpeed);
         this.screenSize = screenSize;
         this.radius = radius;
         this.angle = angle;
         this.attachedToPaddle = attachedToPaddle;
+        this.ballFollowedEvent = ballFollowedEvent;
 
         if(attachedToPaddle) {
             startingPosition.moveY(-radius);
@@ -25,19 +34,36 @@ public class Ball {
 
     public void update(float deltaTime) {
         var radians = Math.toRadians(angle);
-        var xSpeed = Math.cos(radians) * speed.getSpeed();
-        var ySpeed = Math.sin(radians) * speed.getSpeed();
+        var xSpeed = (float)Math.cos(radians) * speed.getSpeed();
+        var ySpeed = (float)Math.sin(radians) * speed.getSpeed();
 
-        position.moveX((float)xSpeed * deltaTime);
-        position.moveY((float)ySpeed * deltaTime);
-
-        if(position.x() + radius > screenSize.width()){
-
+        var simulatedPosition = position.simulateMovement(xSpeed*deltaTime, ySpeed*deltaTime);
+        if(simulatedPosition.x() + radius >= screenSize.width()){
+            invertAngle();
         }
+
+        if(simulatedPosition.x() - (radius+0.1) <= 0){
+            invertAngle();
+        }
+
+        if(simulatedPosition.y() - radius <= 0 && speed.getSpeed() < 0){
+            System.out.println("INVERTING Y");
+            speed.setSpeed(speed.getSpeed()*-1);
+            invertAngle();
+        }
+
+        if(simulatedPosition.y() >= screenSize.height()){
+            ballFollowedEvent.accept(this);
+        }
+
+        xSpeed = (float)Math.cos(radians) * speed.getSpeed();
+        ySpeed = (float)Math.sin(radians) * speed.getSpeed();
+        position.move(new Vector2(xSpeed * deltaTime,ySpeed * deltaTime));
     }
 
     public void invertAngle(){
-
+        System.out.println("INVERTING ANGLE");
+        angle = (180 - angle )%360;
     }
 
     public void updateAngle(float newAngle){
@@ -56,7 +82,7 @@ public class Ball {
 
     public void startMoving(){
         attachedToPaddle = false;
-        speed.setSpeed(150);
+        speed.setSpeed(-250);
     }
 
     //
@@ -69,4 +95,19 @@ public class Ball {
     }
 
     public boolean isAttachedToPaddle(){ return attachedToPaddle; }
+
+    public void collideWithPaddle(float paddleSpeed) {
+        if(speed.getSpeed() > 0) {
+            speed.setSpeed(speed.getSpeed() * -1);
+            invertAngle();
+        }
+    }
+
+    public float getAngle() {
+        return angle;
+    }
+
+    public float getSpeed() {
+        return speed.getSpeed();
+    }
 }
