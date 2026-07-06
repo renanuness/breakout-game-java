@@ -18,5 +18,8 @@ public class RaylibInputController {
         if(IsKeyDown(KEY_UP)){
             controller.throwBall();
         }
+        if(IsKeyReleased(KEY_P)){
+            controller.pauseGame();
+        }
     }
 }

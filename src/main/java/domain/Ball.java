@@ -74,9 +74,19 @@ public class Ball {
         drawBall.draw(this);
     }
 
+    // region Ball position
     public Position getCenterPosition() {
         return position;
     }
+
+    public Position getTopCenterPosition(){
+        return new Position(position.x(), position.y()-radius);
+    }
+
+    public Position getBottomCenterPosition(){
+        return new Position(position.x(), position.y()+radius);
+    }
+    // endregion
 
     public float getRadius() { return radius; }
 
@@ -109,5 +119,16 @@ public class Ball {
 
     public float getSpeed() {
         return speed.getSpeed();
+    }
+
+    public void collideWithBrick(Brick brick) {
+        if ((position.y() > brick.getPosition().y() && position.y() < brick.getPosition().y() + brick.getSize().getHeight())){
+            invertAngle();
+            return;
+        }
+        if(position.x() > brick.getPosition().x() && position.x() < brick.getPosition().x()+ brick.getSize().getWidth()){
+            speed.setSpeed(speed.getSpeed() * -1);
+            invertAngle();
+        }
     }
 }

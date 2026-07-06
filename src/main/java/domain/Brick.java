@@ -18,4 +18,8 @@ public class Brick {
     public Size getSize() { return size; }
 
     public Color getColor() { return color; }
+
+    public void collideWithBall(){
+        this.color = Color.BLACK;
+    }
 }

@@ -40,4 +40,16 @@ public class BrickCollection {
     public void draw(Renderer renderer){
         renderer.draw(this);
     }
+
+    public float getBricksBottomY(){
+        return startingPosition.y() + (bricksLayout.getSize().getHeight() + bricksLayout.rows());
+    }
+
+    public float getBricksTopY(){
+        return startingPosition.y();
+    }
+
+    public void collideWithBall(int row, int column){
+        bricks[row][column].collideWithBall();
+    }
 }

@@ -1,8 +1,6 @@
 package infra;
 
-import domain.Ball;
-import domain.Brick;
-import domain.Paddle;
+import domain.*;
 import domain.interfaces.ColissionDetector;
 
 import static com.raylib.Raylib.CheckCollisionCircleRec;
@@ -16,7 +14,24 @@ public class RaylibCollisionDetector implements ColissionDetector {
     }
 
     @Override
-    public boolean ballAndBrick(Ball ball, Brick brick) {
-        return false;
+    public Brick ballAndBrick(Ball ball, BrickCollection brickCollection) {
+        if(
+            (ball.getTopCenterPosition().y()-(ball.getRadius()*2) > brickCollection.getBricksBottomY()) ||
+            (ball.getBottomCenterPosition().y() < brickCollection.getBricksTopY())
+        ){
+            return null;
+        }
+        var bricks = brickCollection.getBricks();
+        for(int i = 0; i < brickCollection.rows(); i++){
+            for(int j = 0; j < brickCollection.columns(); j++){
+                var brick = bricks[i][j];
+                if(brick.getColor() == Color.BLACK){ continue; }
+                if(CheckCollisionCircleRec(positionToVector2(ball.getCenterPosition()), ball.getRadius(), sizeAndPositionToRectangle(brick.getSize(), brick.getPosition()))){
+                    brick.collideWithBall();
+                    return brick;
+                }
+            }
+        }
+        return null;
     }
 }
