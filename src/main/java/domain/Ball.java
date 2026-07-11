@@ -5,12 +5,15 @@ import domain.interfaces.DrawBall;
 import java.util.function.Consumer;
 
 public class Ball {
+    private final BallPaddleColliderRule rule;
     private Position position;
     private Speed speed;
     private float radius;
     private float angle;
     private ScreenSize screenSize;
     private boolean attachedToPaddle;
+    private boolean followed;
+
     private Consumer<Ball> ballFollowedEvent;
     public Ball(ScreenSize screenSize,
                 Position startingPosition,
@@ -18,6 +21,7 @@ public class Ball {
                 boolean attachedToPaddle,
                 float angle,
                 float initialSpeed,
+                BallPaddleColliderRule rule,
                 Consumer<Ball> ballFollowedEvent){
         speed = new Speed(initialSpeed);
         this.screenSize = screenSize;
@@ -25,11 +29,12 @@ public class Ball {
         this.angle = angle;
         this.attachedToPaddle = attachedToPaddle;
         this.ballFollowedEvent = ballFollowedEvent;
-
+        this.rule = rule;
         if(attachedToPaddle) {
             startingPosition.moveY(-radius);
         }
         position = startingPosition;
+        followed = false;
     }
 
     public void update(float deltaTime) {
@@ -62,7 +67,6 @@ public class Ball {
     }
 
     public void invertAngle(){
-        System.out.println("INVERTING ANGLE");
         angle = (180 - angle )%360;
     }
 
@@ -92,7 +96,7 @@ public class Ball {
 
     public void startMoving(){
         attachedToPaddle = false;
-        speed.setSpeed(-250);
+        speed.setSpeed(-350);
     }
 
     //
@@ -106,11 +110,15 @@ public class Ball {
 
     public boolean isAttachedToPaddle(){ return attachedToPaddle; }
 
-    public void collideWithPaddle(float paddleSpeed) {
+    public void collideWithPaddle(Paddle paddle) {
         if(speed.getSpeed() > 0) {
-            speed.setSpeed(speed.getSpeed() * -1);
-            invertAngle();
+            rule.collide(this, paddle);
         }
+    }
+
+    public void setAngleAndSpeed(float angle, float speed){
+        this.angle = angle;
+        this.speed.setSpeed(speed);
     }
 
     public float getAngle() {
@@ -130,5 +138,13 @@ public class Ball {
             speed.setSpeed(speed.getSpeed() * -1);
             invertAngle();
         }
+    }
+
+    public void follow(){
+        followed = true;
+    }
+
+    public boolean hasFollowed(){
+        return followed;
     }
 }

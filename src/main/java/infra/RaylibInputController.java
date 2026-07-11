@@ -21,5 +21,9 @@ public class RaylibInputController {
         if(IsKeyReleased(KEY_P)){
             controller.pauseGame();
         }
+
+        if(IsKeyReleased(KEY_LEFT) || IsKeyReleased(KEY_RIGHT)){
+            controller.stopPaddle();
+        }
     }
 }

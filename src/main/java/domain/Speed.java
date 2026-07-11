@@ -8,6 +8,10 @@ public class Speed {
     }
 
 
+    public void accelerate(float acceleration){
+        speed += acceleration;
+    }
+
     public float getSpeed() { return speed; }
 
     public void setSpeed(float speed) {

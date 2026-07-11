@@ -15,15 +15,16 @@ public class Game {
     private final ScreenSize screenSize;
     private final BrickCollection brickCollection;
     private boolean paused;
+    private GameStates gameState;
 
     public Game(Definitions definitions){
         this.screenSize = definitions.getScreenSize();
         float ballRadius = 15f;
-        paused = false;
+        gameState = GameStates.PLAY;
         var pos = new Position(512, 700);
         paddle = new Paddle(screenSize, pos);
         balls = new ArrayList<>();
-        balls.add(new Ball(screenSize, new Position(paddle.getMiddleX(), pos.y()), ballRadius,true, 45, 0, (this::ballFollowed)));
+        balls.add(new Ball(screenSize, new Position(paddle.getMiddleX(), pos.y()), ballRadius,true, 45, 0, new BallPaddleColliderRule(),(this::ballFollowed)));
         createDummyBall();
 
         brickCollection = new BrickCollection(definitions);
@@ -32,25 +33,39 @@ public class Game {
                 (x)->this.movePaddle(-1),
                 (x)->this.movePaddle(1),
                 (x)->this.throwBall(),
-                (x)->this.pauseToggle()
+                (x)->this.pauseToggle(),
+                (x)-> paddle.stop()
         );
     }
 
     private void createDummyBall(){
-        var ball = new Ball(screenSize, new Position(screenSize.width()/2, screenSize.height()/2), 15f, false, 45, -200, (this::ballFollowed));
+        var ball = new Ball(screenSize, new Position(screenSize.width()/2, screenSize.height()/2), 15f, false, 45, -200, new BallPaddleColliderRule(), (this::ballFollowed));
         balls.add(ball);
     }
 
     public void update(ColissionDetector colissionDetector){
-        if(paused){ return;}
-        for(var ball : balls){
-            ball.update(deltaTime);
-            if(colissionDetector.ballAndPaddle(ball, paddle)){
-                ball.collideWithPaddle(paddle.getSpeed().getSpeed());
+        if(isPaused()){ return;}
+
+        if(gameState == GameStates.PLAY) {
+            for (var ball : balls) {
+                if(ball.hasFollowed()){ continue; }
+                ball.update(deltaTime);
+                if (colissionDetector.ballAndPaddle(ball, paddle)) {
+                    ball.collideWithPaddle(paddle);
+                }
+                var brick = colissionDetector.ballAndBrick(ball, brickCollection);
+                if (brick != null) {
+                    ball.collideWithBrick(brick);
+                }
             }
-            var brick = colissionDetector.ballAndBrick(ball, brickCollection);
-            if(brick != null){
-                ball.collideWithBrick(brick);
+
+            paddle.update(deltaTime);
+
+            balls.removeIf(b -> b.hasFollowed());
+
+            if(balls.isEmpty()){
+                gameState = GameStates.GAME_OVER;
+                System.out.println("GAME OVER");
             }
         }
     }
@@ -59,7 +74,7 @@ public class Game {
         if(dir == -1) {
             if (paddle.moveLeft(deltaTime)) {
                 if (balls.stream().anyMatch(Ball::isAttachedToPaddle)) {
-                    balls.stream().filter(Ball::isAttachedToPaddle).forEach(b -> b.moveLeft(paddle.getSpeed().getSpeed(), deltaTime));
+                    balls.stream().filter(Ball::isAttachedToPaddle).forEach(b -> b.moveLeft(-paddle.getSpeed().getSpeed(), deltaTime));
                 }
             }
         }
@@ -97,17 +112,20 @@ public class Game {
     }
 
     private void ballFollowed(Ball ball){
-        balls.remove(ball);
-        if(balls.isEmpty()){
-            System.out.println("GAME OVER");
-        }
+        ball.follow();
     }
 
     public List<Ball> getBalls() { return balls;    }
 
     public void pauseToggle(){
-        paused = !paused;
-        var msg = paused ? "GAME PAUSED" : "GAME UNPAUSED";
-        System.out.println(msg);
+        if(gameState == GameStates.PAUSED){
+            gameState = GameStates.PLAY;
+        }else if(gameState == GameStates.PLAY){
+            gameState = GameStates.PAUSED;
+        }
+    }
+
+    private boolean isPaused(){
+        return gameState == GameStates.PAUSED;
     }
 }
